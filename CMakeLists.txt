@@ -31,3 +31,12 @@ ${GLFW_LIBRARIES}
 # Link libraries
 #target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES} ${GLFW_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} glfw3  Vulkan::Vulkan)
+
+# Copy folder to build destination 
+# not working ?
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory 
+    "${CMAKE_SOURCE_DIR}/src/shaders" 
+    "$<TARGET_FILE_DIR:${CMAKE_BINARY_DIR}/Debug")
+
+message(STATUS "Build directory: ${CMAKE_BINARY_DIR}")

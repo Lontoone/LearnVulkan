@@ -1,9 +1,9 @@
 #pragma once
 
-#include "display_window.hpp"
-#include "pipeline.hpp"
-
-namespace lontoone{
+#include "lve_window.hpp"
+#include "lve_pipeline.hpp"
+#include "lve_device.hpp"
+namespace lve{
     class FirstApp{
         public:
             static constexpr int WIDTH = 800;
@@ -11,7 +11,15 @@ namespace lontoone{
 
             void run();
         private : 
-            Window window{WIDTH , HEIGHT , "Hello"};
-            Pipeline pipeline{"./shaders/simple_shader.vert.spv" ,"./shaders/simple_shader.frag.spv" };
+            LveWindow lveWindow{WIDTH , HEIGHT , "Hello"};
+            
+            LveDevice device{lveWindow};            
+            LvePipeline lvePipeline{
+                device,
+                "./shaders/simple_shader.vert.spv" ,
+                "./shaders/simple_shader.frag.spv" ,
+                LvePipeline::defaultPipelineConfigInfo(WIDTH , HEIGHT )
+                };
+
     };
 }
