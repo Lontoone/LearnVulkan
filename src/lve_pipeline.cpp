@@ -105,6 +105,12 @@ namespace lve{
         vkDestroyPipeline(lveDevice.device(), graphicsPipeline, nullptr);
     }
 
+    void LvePipeline::bind(VkCommandBuffer commandBuffer)
+    {
+        
+        vkCmdBindPipeline(commandBuffer , VK_PIPELINE_BIND_POINT_GRAPHICS , graphicsPipeline);
+    }
+
     PipelineConfigInfo LvePipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
     {
         PipelineConfigInfo configInfo{};
