@@ -3,6 +3,9 @@
 #include "./core/SwapChain.hpp"
 #include "./core/GraphicsPipeline.hpp"
 #include "render/Renderer.hpp"
+#include "imgui.h" 
+#include "imgui_impl_vulkan.h"
+#include "imgui_impl_glfw.h"
 int main() {
 	ltn::DisplayWindow main_window{};
 	ltn::CoreInstance coreInstance{ *main_window.get_window() };
