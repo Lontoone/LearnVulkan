@@ -4,16 +4,19 @@
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
+#include <iostream>
+
 namespace ltn {
 	class DisplayWindow {
 	public:
 		DisplayWindow();
 		~DisplayWindow();
-		const unsigned int SCR_WIDTH = 480;
-		const unsigned int SCR_HEIGHT = 480;
+		int SCR_WIDTH = 480;
+		int SCR_HEIGHT = 480;
+		bool frameBufferedResized = false;
 		void init_window();
 		bool is_window_alive();
-		void init_vulkan_surface(VkInstance instance);
+		
 
 		void destroy_resources();
 	
@@ -26,7 +29,7 @@ namespace ltn {
 
 	private:
 		GLFWwindow* window;	
-		//VkSurfaceKHR m_surface;
+		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 };
 
 }

@@ -1,6 +1,6 @@
 #include "SwapChain.hpp"
 
-ltn::SwapChain::SwapChain(CoreInstance& core_instance, const unsigned int w, const unsigned int h)
+ltn::SwapChain::SwapChain(CoreInstance& core_instance, int w, int h)
 	:m_core_instance{ core_instance }, m_width{ w }, m_height{ h } {
 	//---------------------------
 	// 	   Get Support
@@ -19,8 +19,9 @@ ltn::SwapChain::SwapChain(CoreInstance& core_instance, const unsigned int w, con
 
 ltn::SwapChain::~SwapChain()
 {
-	cleanup();
+	//cleanup();
 }
+
 
 void ltn::SwapChain::create_swap_chain(const VkSurfaceFormatKHR& surface_format, const VkPresentModeKHR& present_mode, const VkExtent2D& extent)
 {
@@ -80,8 +81,7 @@ void ltn::SwapChain::create_swap_chain(const VkSurfaceFormatKHR& surface_format,
 	//we don't care about the color of pixels that are obscured, for example because another window is in front of them.
 	createInfo.clipped = VK_TRUE;
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
-
-
+		
 	try {
 		if (vkCreateSwapchainKHR(m_core_instance.get_device(), &createInfo, nullptr, &m_swapchain) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create swap chain!");
@@ -90,6 +90,7 @@ void ltn::SwapChain::create_swap_chain(const VkSurfaceFormatKHR& surface_format,
 	catch (std::exception& e) {
 		std::cerr << "exception: " << e.what() << "\n";
 	}
+	
 }
 
 void ltn::SwapChain::create_images()

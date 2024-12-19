@@ -18,6 +18,8 @@ namespace ltn {
 		inline const auto get_renderPass()const { return m_renderpass; } // Todo : split to small class
 		inline VkCommandBuffer& get_current_cmdbuffer() { return m_commandBuffers[m_swapchain.current_frame()]; }
 
+		// End
+		void cleanup();
 	private:
 		CoreInstance& m_core_instance;
 		SwapChain& m_swapchain;
@@ -33,8 +35,6 @@ namespace ltn {
 		
 		uint32_t m_imageIndex;
 
-		// End
-		void cleanup();
 
 	};
 

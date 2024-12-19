@@ -16,6 +16,8 @@ namespace ltn{
 		void create_pipleine(VkRenderPass renderpass,
 			std::vector<VkDescriptorSetLayout>* descriptors);
 		inline VkPipeline get_pipeline() {return m_graphicsPipeline;};
+
+		void cleanup();
     private:
 		CoreInstance& m_core_instance;
 		SwapChain& m_swapchain;
@@ -27,6 +29,5 @@ namespace ltn{
 
 		VkShaderModule createShaderModule(const std::vector<char>& code);
 
-		void cleanup();
     };
 }

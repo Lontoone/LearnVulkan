@@ -13,7 +13,7 @@
 namespace ltn{
     class SwapChain {
     public:
-        SwapChain(CoreInstance& core_instance, const unsigned int w, const unsigned int h);
+        SwapChain(CoreInstance& core_instance, int w, int h);
         ~SwapChain(); //todo....
 
         // With 3 or more frames in flight, the CPU could get ahead of the GPU, adding frames of latency. 
@@ -36,9 +36,11 @@ namespace ltn{
         inline const VkSemaphore get_finish_semaphore() { return m_renderFinishedSemaphores[m_currentFrame]; }  // todo: auto fence pool
         inline const VkImageView& get_depth_img_view() const { return depthImageView; }
         void update_frame_count() { (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT; };
+
+        void cleanup();
     private:
-        const unsigned int m_width;
-        const unsigned int m_height;
+        int m_width;
+        int m_height;
         CoreInstance& m_core_instance;
         SwapChainSupportDetails     m_support_details{};
         uint32_t                    m_image_count;
@@ -74,7 +76,6 @@ namespace ltn{
 
         void create_swap_chain(const VkSurfaceFormatKHR& format, const VkPresentModeKHR& present_mode, const VkExtent2D& extent);
 
-        void cleanup();
     };
 
 }

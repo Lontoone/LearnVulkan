@@ -19,16 +19,13 @@ void ltn::DisplayWindow::init_window()
 
 
 	this->window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "test window", nullptr, nullptr);
-
+	glfwSetWindowUserPointer(window,this);
+	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
 bool ltn::DisplayWindow::is_window_alive()
 {
 	return !glfwWindowShouldClose(this->window);
-}
-
-void ltn::DisplayWindow::init_vulkan_surface(VkInstance instance)
-{
 }
 
 void ltn::DisplayWindow::destroy_resources()
@@ -37,3 +34,17 @@ void ltn::DisplayWindow::destroy_resources()
 	//vkDestroySurfaceKHR(m_core_instance.get_instance(), m_surface, nullptr);
 	glfwTerminate();
 }
+
+void ltn::DisplayWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height)
+{
+	std::cout << "resize \n";
+	auto ltnWindow = reinterpret_cast<DisplayWindow*>(glfwGetWindowUserPointer(window));
+	ltnWindow->SCR_WIDTH = width;
+	ltnWindow->SCR_HEIGHT = height;
+	ltnWindow->frameBufferedResized = true;
+
+}
+
+
+
+

@@ -11,7 +11,7 @@ ltn::Renderer::Renderer(ltn::CoreInstance &core_instance, ltn::SwapChain& swapch
 }
 ltn::Renderer::~Renderer()
 {
-    cleanup();
+    //cleanup();
 }
 
 void ltn::Renderer::create_frameBuffer(SwapChain& swapchain, VkRenderPass renderPass)
@@ -387,6 +387,6 @@ void ltn::Renderer::cleanup()
     for (auto framebuffer : m_swapChain_framebuffers) {
         vkDestroyFramebuffer(m_core_instance.get_device(), framebuffer, nullptr);
     }
-    vkDestroyCommandPool(m_core_instance.get_device(), m_core_instance.cmd_pool(), nullptr);
+    //vkDestroyCommandPool(m_core_instance.get_device(), m_core_instance.cmd_pool(), nullptr);
     vkDestroyRenderPass(m_core_instance.get_device(), m_renderpass, nullptr);
 }
