@@ -20,28 +20,47 @@ endif()
 set(GLFW_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/lib/glfw/include")
 set(GLFW_LIBRARIES "${PROJECT_SOURCE_DIR}/lib/glfw/lib-vc2022")
 set(GLM_LIBRARIES "${PROJECT_SOURCE_DIR}/lib/glm")
+set(IMGUI_LIBRARIES "${PROJECT_SOURCE_DIR}/include/imgui")
+set(IMGUI_BK_LIBRARIES "${PROJECT_SOURCE_DIR}/include/imgui/backends")
 
 set(CMAKE_CXX_STANDARD 20)  # using c++ version 20
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Source files
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.hpp" "src/*.h")
+#file(GLOB_RECURSE INCLUDE "include/imgui/*.cpp" "include/imgui/*.h"  "include/imgui/backends/*.h" "include/imgui/backends/*.cpp")
+#file(GLOB_RECURSE INCLUDE "include/imgui/*.cpp" )
 
-# Add executable
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC 
-${Vulkan_INCLUDE_DIRS}
-${GLFW_INCLUDE_DIRS})
-target_link_directories(${PROJECT_NAME} PUBLIC
-${Vulkan_LIBRARIES}
-${GLFW_LIBRARIES}
+
+add_library(imgui
+	${IMGUI_LIBRARIES}/imgui.cpp
+	${IMGUI_LIBRARIES}/imgui_draw.cpp
+	${IMGUI_LIBRARIES}/imgui_tables.cpp
+	${IMGUI_LIBRARIES}/imgui_widgets.cpp
+    ${IMGUI_LIBRARIES}/backends/imgui_impl_vulkan.cpp
+    ${IMGUI_LIBRARIES}/backends/imgui_impl_glfw.cpp
 )
 
+# Add executable
+add_executable(${PROJECT_NAME} ${SOURCES} ${imgui})
+target_include_directories(${PROJECT_NAME} PUBLIC 
+    ${Vulkan_INCLUDE_DIRS}
+    ${GLFW_INCLUDE_DIRS})
+target_link_directories(${PROJECT_NAME} PUBLIC
+    ${Vulkan_LIBRARIES}
+    ${GLFW_LIBRARIES}
+)
+# Add Imgui-docking
+
+include_directories(${IMGUI_LIBRARIES} ${IMGUI_BK_LIBRARIES} ..)
+target_include_directories(${PROJECT_NAME} PUBLIC ${IMGUI_LIBRARIES} ${IMGUI_BK_LIBRARIES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE imgui ${IMGUI_LIBRARIES}/backends)
+#target_include_directories(imgui PUBLIC ${IMGUI_LIBRARIES})
+
 # Link libraries
-#target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES} ${GLFW_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} glfw3  Vulkan::Vulkan)
+target_link_libraries(${PROJECT_NAME} glfw3  Vulkan::Vulkan imgui)
 
 # Copy folder to build destination 
-# not working ?
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory 

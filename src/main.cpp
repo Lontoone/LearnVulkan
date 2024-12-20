@@ -3,6 +3,8 @@
 #include "./core/SwapChain.hpp"
 #include "./core/GraphicsPipeline.hpp"
 #include "render/Renderer.hpp"
+#include "./core/UiManager.hpp"
+
 int main() {
 	ltn::DisplayWindow main_window{};
 	ltn::CoreInstance coreInstance{ *main_window.get_window() };
@@ -10,16 +12,32 @@ int main() {
 	std::unique_ptr<ltn::GraphicsPipeline> pipeline = std::make_unique<ltn::GraphicsPipeline>( coreInstance , *swapchain );
 	std::unique_ptr<ltn::Renderer>forward_renderer_pass = std::make_unique<ltn::Renderer>( coreInstance , *swapchain );
 
-
 	pipeline->create_pipleine(
 		forward_renderer_pass->get_renderPass(),
 		nullptr
 		//gameobject.get_all_descriptorLayouts()
 	);
+
+		
+	ltn::UiManager ui_manager{};
+	ui_manager.InitUi(main_window.get_window() , coreInstance.get_instance(), coreInstance.get_device() , coreInstance.get_physical_device() , coreInstance.get_queuefailmy_indexs()->graphic_queuefamily_index.value(),coreInstance.graphic_queue() , forward_renderer_pass->get_renderPass() , swapchain->MAX_FRAMES_IN_FLIGHT);
+	
+
 	while (main_window.is_window_alive())
 	{
 		glfwPollEvents();
-
+		// Start the ImGui frame 
+		ImGui_ImplVulkan_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::Begin("Hello, world!");
+		ImGui::Text("hi");
+		ImGui::End();
+		ImGui::Begin("Hello2");
+		ImGui::Text("hi2");
+		ImGui::End();
+		//ImGui::ShowDemoWindow();
+		
 		// Detect resize :
 		if (main_window.frameBufferedResized) {
 			main_window.frameBufferedResized = false;
@@ -43,6 +61,10 @@ int main() {
 		//===========================
 		//		Draw commands
 		//===========================
+		ImGui::Render();
+		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), forward_renderer_pass->get_current_cmdbuffer());
+
+
 		vkCmdBindPipeline(
 			forward_renderer_pass->get_current_cmdbuffer(),
 			VK_PIPELINE_BIND_POINT_GRAPHICS, 
@@ -74,4 +96,5 @@ int main() {
 	//
 	swapchain->cleanup();
 	forward_renderer_pass->cleanup();
+
 }
