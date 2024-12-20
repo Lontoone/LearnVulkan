@@ -1,7 +1,7 @@
 #pragma once
 #include <vulkan/vulkan_core.h>
-
-
+#include <vector>
+#include <stdexcept>
 static VkFormat findSupportedFormat(const VkPhysicalDevice& physicalDevice, const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
     for (VkFormat format : candidates) {
         VkFormatProperties props;

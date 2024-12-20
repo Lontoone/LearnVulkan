@@ -4,6 +4,7 @@
 #include "./core/GraphicsPipeline.hpp"
 #include "render/Renderer.hpp"
 #include "./core/UiManager.hpp"
+#include "./core/Model.hpp"
 
 int main() {
 	ltn::DisplayWindow main_window{};
@@ -11,6 +12,8 @@ int main() {
 	std::unique_ptr<ltn::SwapChain> swapchain = std::make_unique<ltn::SwapChain>(coreInstance,main_window.SCR_WIDTH , main_window.SCR_HEIGHT);
 	std::unique_ptr<ltn::GraphicsPipeline> pipeline = std::make_unique<ltn::GraphicsPipeline>( coreInstance , *swapchain );
 	std::unique_ptr<ltn::Renderer>forward_renderer_pass = std::make_unique<ltn::Renderer>( coreInstance , *swapchain );
+
+	ltn::Model model{ coreInstance };
 
 	pipeline->create_pipleine(
 		forward_renderer_pass->get_renderPass(),
@@ -69,22 +72,9 @@ int main() {
 			forward_renderer_pass->get_current_cmdbuffer(),
 			VK_PIPELINE_BIND_POINT_GRAPHICS, 
 			pipeline->get_pipeline());
-		/*
-		VkViewport viewport;
-		viewport.x = 0; 
-		viewport.y = 0;
-		viewport.width = main_window.SCR_WIDTH;
-		viewport.height= main_window.SCR_HEIGHT;
-		viewport.minDepth = 0;
-		viewport.maxDepth = 1;
-		vkCmdSetViewport(forward_renderer_pass->get_current_cmdbuffer() , 0 , 1 , &viewport);
-
-		VkRect2D scissor;
-		scissor.offset = {0,0};
-		scissor.extent = { static_cast<unsigned int>( main_window.SCR_WIDTH) , static_cast<unsigned int>(main_window.SCR_HEIGHT) };
-		vkCmdSetScissor(forward_renderer_pass->get_current_cmdbuffer() , 0 , 1 , &scissor);
-		*/
-
+		
+		model.bind(forward_renderer_pass->get_current_cmdbuffer());
+			
 		vkCmdDraw(forward_renderer_pass->get_current_cmdbuffer(), 3, 1, 0, 0);
 		//------------------------------
 

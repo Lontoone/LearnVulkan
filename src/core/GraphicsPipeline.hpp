@@ -4,6 +4,7 @@
 #include "../utli/file_loader.hpp"
 #include <iostream>
 #include <filesystem>
+#include "../utli/structure.hpp"
 
 
 namespace ltn{

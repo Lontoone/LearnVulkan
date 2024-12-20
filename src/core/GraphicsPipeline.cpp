@@ -59,11 +59,15 @@ void ltn::GraphicsPipeline::create_pipleine(
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	//auto vert_binding_dscp = Model::Vertex::get_binding_description();
 	//auto attr_binding_dscp = Model::Vertex::get_attribute_descriptions();
-
+	auto bindingDescription = Vertex::getBindingDescription();
+	auto attributeDescriptions = Vertex::getAttributeDescriptions();
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	//vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+	//vertexInputInfo.vertexBindingDescriptionCount = 0;
+	//vertexInputInfo.vertexAttributeDescriptionCount = 0;
 	//vertexInputInfo.pVertexBindingDescriptions = &vert_binding_dscp; // Optional
 	//vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attr_binding_dscp.size());
 	//vertexInputInfo.pVertexAttributeDescriptions = attr_binding_dscp.data(); // Optional
