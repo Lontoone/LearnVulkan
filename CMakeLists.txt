@@ -38,7 +38,6 @@ add_library(imgui
 	${IMGUI_LIBRARIES}/imgui_widgets.cpp
     ${IMGUI_LIBRARIES}/backends/imgui_impl_vulkan.cpp
     ${IMGUI_LIBRARIES}/backends/imgui_impl_glfw.cpp
-	#${IMGUI_LIBRARIES}/backends/imgui_impl_allegro5.cpp
 )
 
 # Add executable
