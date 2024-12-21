@@ -5,7 +5,7 @@ ltn::UiManager::~UiManager()
 	cleanup();
 }
 
-void ltn::UiManager::InitUi(GLFWwindow* window, VkInstance instance, VkDevice device, VkPhysicalDevice physical_device, uint32_t queue_family, VkQueue queue, VkRenderPass renderpass, int image_count)
+void ltn::UiManager::initUi(GLFWwindow* window, VkInstance instance, VkDevice device, VkPhysicalDevice physical_device, uint32_t queue_family, VkQueue queue, VkRenderPass renderpass, int image_count)
 {
 
 	ImGui::CreateContext();
@@ -61,6 +61,14 @@ void ltn::UiManager::InitUi(GLFWwindow* window, VkInstance instance, VkDevice de
 	init_info.CheckVkResultFn = nullptr;
 	ImGui_ImplVulkan_Init(&init_info);
 
+
+	//Others parameters:
+	m_fps_start_time = std::chrono::high_resolution_clock::now();
+}
+
+void ltn::UiManager::update()
+{
+	calculat_fps();
 }
 
 void ltn::UiManager::cleanup()
@@ -69,6 +77,15 @@ void ltn::UiManager::cleanup()
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void ltn::UiManager::calculat_fps()
+{
+	auto currentTime = std::chrono::high_resolution_clock::now(); 
+	std::chrono::duration<float> elapsedTime = currentTime - m_fps_start_time;
+	m_fps_start_time = currentTime;
+	m_fps = 1.0 / elapsedTime.count();
+
 }
 
 

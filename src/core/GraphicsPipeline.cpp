@@ -56,9 +56,7 @@ void ltn::GraphicsPipeline::create_pipleine(
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
 	
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-	//auto vert_binding_dscp = Model::Vertex::get_binding_description();
-	//auto attr_binding_dscp = Model::Vertex::get_attribute_descriptions();
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};	
 	auto bindingDescription = Vertex::getBindingDescription();
 	auto attributeDescriptions = Vertex::getAttributeDescriptions();
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;

@@ -6,6 +6,8 @@
 #include "./core/UiManager.hpp"
 #include "./core/Model.hpp"
 
+
+
 int main() {
 	ltn::DisplayWindow main_window{};
 	ltn::CoreInstance coreInstance{ *main_window.get_window() };
@@ -23,8 +25,9 @@ int main() {
 
 		
 	ltn::UiManager ui_manager{};
-	ui_manager.InitUi(main_window.get_window() , coreInstance.get_instance(), coreInstance.get_device() , coreInstance.get_physical_device() , coreInstance.get_queuefailmy_indexs()->graphic_queuefamily_index.value(),coreInstance.graphic_queue() , forward_renderer_pass->get_renderPass() , swapchain->MAX_FRAMES_IN_FLIGHT);
+	ui_manager.initUi(main_window.get_window() , coreInstance.get_instance(), coreInstance.get_device() , coreInstance.get_physical_device() , coreInstance.get_queuefailmy_indexs()->graphic_queuefamily_index.value(),coreInstance.graphic_queue() , forward_renderer_pass->get_renderPass() , swapchain->MAX_FRAMES_IN_FLIGHT);
 	
+
 
 	while (main_window.is_window_alive())
 	{
@@ -37,7 +40,8 @@ int main() {
 		ImGui::Text("hi");
 		ImGui::End();
 		ImGui::Begin("Hello2");
-		ImGui::Text("hi2");
+		ImGui::Text("fps %d " , ui_manager.get_run_time_fps());
+		
 		ImGui::End();
 		//ImGui::ShowDemoWindow();
 		
@@ -50,12 +54,14 @@ int main() {
 			
 			swapchain = std::make_unique<ltn::SwapChain>(coreInstance, main_window.SCR_WIDTH, main_window.SCR_HEIGHT);
 			forward_renderer_pass = std::make_unique<ltn::Renderer>(coreInstance, *swapchain);
+			/*
 			pipeline = std::make_unique<ltn::GraphicsPipeline>(coreInstance, *swapchain);
 			pipeline->create_pipleine(
 				forward_renderer_pass->get_renderPass(),
 				nullptr
 				//gameobject.get_all_descriptorLayouts()
 			);
+			*/
 		}
 
 		forward_renderer_pass->reset_renderpass();
@@ -80,6 +86,8 @@ int main() {
 
 		forward_renderer_pass->end_render();
 		forward_renderer_pass->draw_frame();
+
+		ui_manager.update();
 	}
 
 	vkDeviceWaitIdle(coreInstance.get_device());
