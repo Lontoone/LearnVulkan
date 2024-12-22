@@ -22,32 +22,53 @@ void ltn::Model::bind(VkCommandBuffer& cmdbuffer)
 
 void ltn::Model::createVBO()
 {
-	VkBufferCreateInfo bufferInfo{};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = sizeof(vertices[0]) * vertices.size();
-	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	// The buffer will only be used from the graphics queue, 
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	if (vkCreateBuffer(coreInstance.get_device(), &bufferInfo, nullptr, &vertexBuffer) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create vertex buffer!");
-	}
+	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+	/*
+	createBuffer(
+		coreInstance.get_device(),
+		coreInstance.get_physical_device(),
+		bufferSize, 
+		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertexBuffer, vertexBufferMemory);
+	*/
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingBufferMemory;
+	createBuffer(
+		coreInstance.get_device(),
+		coreInstance.get_physical_device(),
+		bufferSize,
+		VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+		stagingBuffer, stagingBufferMemory);
 
-	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(coreInstance.get_device(), vertexBuffer, &memRequirements);
-	VkMemoryAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = findMemoryType(coreInstance.get_physical_device(), memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-	if (vkAllocateMemory(coreInstance.get_device(), &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate vertex buffer memory!");
-	}
-	vkBindBufferMemory(coreInstance.get_device(), vertexBuffer, vertexBufferMemory, 0);
-
-	//copy data
+	//Copy to Staging buffer
 	void* data;
-	vkMapMemory(coreInstance.get_device(), vertexBufferMemory, 0, bufferInfo.size, 0, &data);
-	memcpy(data, vertices.data(), (size_t)bufferInfo.size);
-	vkUnmapMemory(coreInstance.get_device(), vertexBufferMemory);
+	vkMapMemory(coreInstance.get_device(), stagingBufferMemory, 0, bufferSize, 0, &data);
+	memcpy(data, vertices.data(), (size_t)bufferSize);
+	vkUnmapMemory(coreInstance.get_device(), stagingBufferMemory);
+
+	// Allocate a memory on GPU that CPU can not access
+	createBuffer(
+		coreInstance.get_device(),
+		coreInstance.get_physical_device(),
+		bufferSize,
+		VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+		vertexBuffer,
+		vertexBufferMemory);
+
+	copyBuffer(
+		coreInstance.get_device(),
+		coreInstance.get_queuefailmy_indexs()->graphic_queuefamily_index.value(),
+		coreInstance.graphic_queue(),
+		stagingBuffer, 
+		vertexBuffer, 
+		bufferSize);
+
+	vkDestroyBuffer(coreInstance.get_device(), stagingBuffer, nullptr);
+	vkFreeMemory(coreInstance.get_device(), stagingBufferMemory, nullptr);
+
+
 }
 
 void ltn::Model::cleanup()
