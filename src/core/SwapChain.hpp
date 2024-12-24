@@ -1,4 +1,5 @@
 #pragma once
+#include "../core/config.hpp"
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <vulkan/vulkan_core.h>
@@ -17,7 +18,7 @@ namespace ltn{
         ~SwapChain(); //todo....
 
         // With 3 or more frames in flight, the CPU could get ahead of the GPU, adding frames of latency. 
-        static const int MAX_FRAMES_IN_FLIGHT = 2;
+        //static const int MAX_FRAMES_IN_FLIGHT = 2;
 
         struct SwapChainSupportDetails {
             VkSurfaceCapabilitiesKHR capabilities;

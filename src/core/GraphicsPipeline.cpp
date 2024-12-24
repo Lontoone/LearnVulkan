@@ -7,6 +7,8 @@ ltn::GraphicsPipeline::GraphicsPipeline(CoreInstance& _core, SwapChain& swapchai
 	std::cout << "Current path: " << currentPath << std::endl;
 
 	load_shaders();
+
+
 }
 
 ltn::GraphicsPipeline::~GraphicsPipeline()
@@ -229,8 +231,11 @@ void ltn::GraphicsPipeline::create_pipleine(
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	/*
 	pipelineLayoutInfo.setLayoutCount = 0; // Optional
-	pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
 	*/
+	
+	pipelineLayoutInfo.setLayoutCount = 1;
+	pipelineLayoutInfo.pSetLayouts = descriptors->data(); // Optional
+
 	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 	//pipelineLayoutInfo.setLayoutCount = 1;//static_cast<uint32_t>( descriptors.size()); // Optional
@@ -302,9 +307,12 @@ VkShaderModule ltn::GraphicsPipeline::createShaderModule(const std::vector<char>
 	return shaderModule;
 }
 
+
 void ltn::GraphicsPipeline::cleanup()
 {
 	vkDestroyShaderModule(this->m_core_instance.get_device() , m_frag_shader_module , nullptr);
 	vkDestroyShaderModule(this->m_core_instance.get_device() , m_vert_shader_module , nullptr);
 	vkDestroyPipelineLayout(this->m_core_instance.get_device() , m_pipeline_layout , nullptr);
+	
+	
 }

@@ -33,4 +33,19 @@ namespace ltn
             return attributeDescriptions;
         }
     };
+
+    struct UniformBufferObject {
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 proj;
+    };
+
+
+    struct FrameUpdateData
+    {
+        uint32_t current_image;
+        float aspect_ratio;
+        VkCommandBuffer cmdbuf;
+    };
+
 } 

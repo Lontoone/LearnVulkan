@@ -45,7 +45,7 @@ void ltn::Renderer::create_frameBuffer(SwapChain& swapchain, VkRenderPass render
 
 void ltn::Renderer::create_commandBuffer()
 {
-    m_commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+    m_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
