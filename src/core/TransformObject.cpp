@@ -1,7 +1,8 @@
 #include "TransformObject.hpp"
 
 
-ltn::TransformObject::TransformObject(CoreInstance& core_instance) : m_core_instance{core_instance}
+ltn::TransformObject::TransformObject(CoreInstance& core_instance, GraphicsPipeline& pipeline) 
+	: m_core_instance{ core_instance }, m_pipeline{pipeline}
 {
 	createUniformBuffers();
 	createDescriptorSetLayout();
@@ -17,6 +18,11 @@ ltn::TransformObject::~TransformObject()
 void ltn::TransformObject::update(FrameUpdateData& framedata) 
 {
     updateUniformBuffer(framedata);
+}
+
+VkDescriptorSetLayout ltn::TransformObject::get_descriptorset_layout()
+{
+	return m_descriptorSetLayout;
 }
 
 void ltn::TransformObject::updateUniformBuffer(FrameUpdateData& framedata)
@@ -51,6 +57,15 @@ void ltn::TransformObject::updateUniformBuffer(FrameUpdateData& framedata)
 	descriptorWrite.pImageInfo = nullptr; // Optional
 	descriptorWrite.pTexelBufferView = nullptr; // Optional
 	vkUpdateDescriptorSets(m_core_instance.get_device(), 1, &descriptorWrite, 0, nullptr);
+
+	vkCmdBindDescriptorSets(
+		framedata.cmdbuf,
+		VK_PIPELINE_BIND_POINT_GRAPHICS,
+		m_pipeline.get_layout(),
+		0,
+		1,
+		&m_descriptorSets[framedata.current_image], 0, nullptr);
+
 }
 
 void ltn::TransformObject::createUniformBuffers()

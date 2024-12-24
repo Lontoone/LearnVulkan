@@ -6,6 +6,7 @@
 #include "./core/UiManager.hpp"
 #include "./core/Model.hpp"
 #include "./core/TransformObject.hpp"
+#include "core/GameObject.hpp"
 
 
 int main() {
@@ -14,17 +15,18 @@ int main() {
 	std::unique_ptr<ltn::SwapChain> swapchain = std::make_unique<ltn::SwapChain>(coreInstance,main_window.SCR_WIDTH , main_window.SCR_HEIGHT);
 	std::unique_ptr<ltn::GraphicsPipeline> pipeline = std::make_unique<ltn::GraphicsPipeline>( coreInstance , *swapchain );
 	std::unique_ptr<ltn::Renderer>forward_renderer_pass = std::make_unique<ltn::Renderer>( coreInstance , *swapchain );
-	
-	ltn::TransformObject transform{ coreInstance };
-	ltn::Model model{ coreInstance };
+	ltn::GameObject gameobject{};
+	ltn::TransformObject transform{ coreInstance, *pipeline };
+	ltn::Model model{ coreInstance , *pipeline};
 
-	std::vector<VkDescriptorSetLayout>temp_descriptorSetLayout{ transform.get_descriptorSetLayout() };
+	gameobject.add_component(&transform);
+	gameobject.add_component(&model);
+
 	pipeline->create_pipleine(
-		forward_renderer_pass->get_renderPass(),
-		&temp_descriptorSetLayout
-		//nullptr
-		//gameobject.get_all_descriptorLayouts()
+		forward_renderer_pass->get_renderPass(),		
+		gameobject.get_all_descriptorLayouts()
 	);
+	
 
 		
 	ltn::UiManager ui_manager{};
@@ -33,6 +35,7 @@ int main() {
 	while (main_window.is_window_alive())
 	{
 		glfwPollEvents();
+
 		// Start the ImGui frame 
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -44,13 +47,6 @@ int main() {
 		ImGui::Text("fps %d " , ui_manager.get_run_time_fps());
 		
 		ImGui::End();
-		
-		ltn::FrameUpdateData update_data{
-			swapchain->current_frame(),
-			1,
-			forward_renderer_pass->get_current_cmdbuffer(),
-		};
-		transform.update(update_data);
 		
 		// Detect resize :
 		if (main_window.frameBufferedResized) {
@@ -69,7 +65,14 @@ int main() {
 				//gameobject.get_all_descriptorLayouts()
 			);
 			*/
+			vkDeviceWaitIdle(coreInstance.get_device());
 		}
+		// collect update data
+		ltn::FrameUpdateData update_data{
+			swapchain->current_frame(),
+			(float)main_window.SCR_WIDTH/ (float)main_window.SCR_HEIGHT,
+			forward_renderer_pass->get_current_cmdbuffer(),
+		};
 
 		forward_renderer_pass->reset_renderpass();
 		forward_renderer_pass->begin_commandBuffer();
@@ -80,19 +83,7 @@ int main() {
 		ImGui::Render();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), forward_renderer_pass->get_current_cmdbuffer());
 
-
-		vkCmdBindPipeline(
-			forward_renderer_pass->get_current_cmdbuffer(),
-			VK_PIPELINE_BIND_POINT_GRAPHICS, 
-			pipeline->get_pipeline());
-		vkCmdBindDescriptorSets(
-			forward_renderer_pass->get_current_cmdbuffer(),
-			VK_PIPELINE_BIND_POINT_GRAPHICS,
-			pipeline->get_layout(), 0, 1, &transform.m_descriptorSets[swapchain->current_frame()], 0, nullptr);
-		model.bind(forward_renderer_pass->get_current_cmdbuffer());
-		model.draw(forward_renderer_pass->get_current_cmdbuffer());
-		//vkCmdDraw(forward_renderer_pass->get_current_cmdbuffer(), 3, 1, 0, 0);
-			
+		gameobject.execute(update_data);
 		//------------------------------
 
 		forward_renderer_pass->end_render();

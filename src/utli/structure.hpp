@@ -43,7 +43,7 @@ namespace ltn
 
     struct FrameUpdateData
     {
-        uint32_t current_image;
+        uint32_t current_image;        
         float aspect_ratio;
         VkCommandBuffer cmdbuf;
     };

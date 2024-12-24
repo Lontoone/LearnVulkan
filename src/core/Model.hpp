@@ -5,14 +5,20 @@
 #include "../utli//helper_functions.hpp"
 #include "../core/Component.hpp"
 #include "../core/CoreInstance.hpp"
+#include "GraphicsPipeline.hpp"
 #include <vector>
 #include <stdexcept>
 namespace ltn{
     class Model : public Component
     {    
     public:
-        Model(CoreInstance& core);
+        Model(CoreInstance& core, GraphicsPipeline& pipeline);
         ~Model();
+
+       //-----------------
+       //  Component class 
+       //-----------------
+        void            update(FrameUpdateData& update_data) override;
 
         void bind(VkCommandBuffer& cmdbuffer);
         void draw(VkCommandBuffer& cmdbuffer);
@@ -29,6 +35,7 @@ namespace ltn{
         };
 
         CoreInstance& coreInstance;
+        GraphicsPipeline& m_pipeline;
         void createVertexBuffer();
         void createIndexBuffer();
         void cleanup();
@@ -37,6 +44,7 @@ namespace ltn{
         VkDeviceMemory vertexBufferMemory;
         VkBuffer indexBuffer;
         VkDeviceMemory indexBufferMemory;
+
     };
     
     

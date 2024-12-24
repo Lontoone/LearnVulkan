@@ -5,6 +5,7 @@
 #include "../utli//helper_functions.hpp"
 #include "../core/Component.hpp"
 #include "../core/CoreInstance.hpp"
+#include "GraphicsPipeline.hpp"
 #include "SwapChain.hpp"
 
 #define GLM_FORCE_RADIANS
@@ -17,11 +18,12 @@ namespace ltn {
 	class TransformObject : public Component
 	{
 	public:
-		TransformObject (CoreInstance& core_instance);
+		TransformObject (CoreInstance& core_instance , GraphicsPipeline& pipeline);
 		~TransformObject();
 		void update(FrameUpdateData& framedata) override;
+		VkDescriptorSetLayout      get_descriptorset_layout() override;
 		void updateUniformBuffer(FrameUpdateData& framedata);
-		auto inline get_descriptorSetLayout() { return m_descriptorSetLayout; }
+		//auto inline get_descriptorSetLayout() { return m_descriptorSetLayout; }
 
 		std::vector<VkDescriptorSet> m_descriptorSets;
 	private:
@@ -33,6 +35,7 @@ namespace ltn {
 
 		VkDescriptorSetLayout m_descriptorSetLayout;
 		VkDescriptorPool m_descriptorPool;
+		GraphicsPipeline& m_pipeline;
 
 		void createDescriptorSetLayout();
 		void createDescriptorPool();

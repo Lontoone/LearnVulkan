@@ -2,8 +2,9 @@
 
 
 //ltn::Model::Model(VkDevice& _device, VkPhysicalDevice& _physicalDevice) :device{ _device }, physicalDevice{_physicalDevice}
-ltn::Model::Model(CoreInstance& core) :coreInstance{core}
-{
+ltn::Model::Model(CoreInstance& core, GraphicsPipeline& pipeline)
+	:coreInstance{ core }, m_pipeline{pipeline}
+{	
 	createVertexBuffer();
 	createIndexBuffer();
 }
@@ -13,8 +14,16 @@ ltn::Model::~Model()
 	cleanup();
 }
 
+void ltn::Model::update(FrameUpdateData& update_data)
+{
+	this->bind(update_data.cmdbuf);
+	this->draw(update_data.cmdbuf);
+}
+
 void ltn::Model::bind(VkCommandBuffer& cmdbuffer)
 {
+	vkCmdBindPipeline(cmdbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline.get_pipeline());
+
 	VkBuffer vertexBuffers[] = { vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(cmdbuffer, 0, 1, vertexBuffers, offsets);
