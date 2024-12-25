@@ -80,7 +80,9 @@ void ltn::TransformObject::createUniformBuffers()
         createBuffer(
             m_core_instance.get_device(),
             m_core_instance.get_physical_device(),
-            bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            bufferSize, 
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             m_uniformBuffers[i],
             m_uniformBuffersMemory[i]);
         // persistent mapping

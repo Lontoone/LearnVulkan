@@ -2,6 +2,7 @@
 #include <vulkan/vulkan_core.h>
 #include <vector>
 #include <stdexcept>
+#include "../core/CoreInstance.hpp"
 static VkFormat findSupportedFormat(const VkPhysicalDevice& physicalDevice, const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
     for (VkFormat format : candidates) {
         VkFormatProperties props;
@@ -128,6 +129,39 @@ static void createBuffer( VkDevice device , VkPhysicalDevice vkPhysicalDevice, V
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
+static VkCommandBuffer beginSingleTimeCommands(VkDevice device, VkCommandPool cmd_pool) {
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = cmd_pool;
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+}
+
+static void endSingleTimeCommands(ltn::CoreInstance& core_instance, VkCommandBuffer commandBuffer) {
+    vkEndCommandBuffer(commandBuffer);
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    vkQueueSubmit(core_instance.graphic_queue(), 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(core_instance.graphic_queue());
+
+    vkFreeCommandBuffers(core_instance.get_device(), core_instance.cmd_pool(), 1, &commandBuffer);
+}
+
 static void copyBuffer( VkDevice device , uint32_t graphics_queue_family , VkQueue graphics_queue ,  VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
     // Create temp command pool
     VkCommandPool commandPool;
@@ -171,5 +205,6 @@ static void copyBuffer( VkDevice device , uint32_t graphics_queue_family , VkQue
     vkQueueSubmit(graphics_queue, 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(graphics_queue); // wait for the transfer queue to become idle 
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
+    vkDestroyCommandPool(device , commandPool,nullptr);
 
 }

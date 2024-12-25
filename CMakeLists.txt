@@ -6,7 +6,8 @@ project(VulkanProject)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-
+# add single files header under /lib
+include_directories(${PROJECT_SOURCE_DIR}/lib)
 # Set the path to your Vulkan SDK
 if (DEFINED $ENV{VK_SDK_PATH})
     set(Vulkan_INCLUDE_DIRS "$ENV{VK_SDK_PATH}/Include")
@@ -50,7 +51,6 @@ target_link_directories(${PROJECT_NAME} PUBLIC
     ${GLFW_LIBRARIES}
 )
 # Add Imgui-docking
-
 include_directories(${IMGUI_LIBRARIES} ${IMGUI_BK_LIBRARIES} ..)
 target_include_directories(${PROJECT_NAME} PUBLIC ${IMGUI_LIBRARIES} ${IMGUI_BK_LIBRARIES})
 

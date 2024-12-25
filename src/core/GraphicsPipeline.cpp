@@ -233,16 +233,16 @@ void ltn::GraphicsPipeline::create_pipleine(
 	pipelineLayoutInfo.setLayoutCount = 0; // Optional
 	*/
 	
-	pipelineLayoutInfo.setLayoutCount = 1;
-	pipelineLayoutInfo.pSetLayouts = descriptors->data(); // Optional
+	//pipelineLayoutInfo.setLayoutCount = 1;
+	//pipelineLayoutInfo.pSetLayouts = descriptors->data(); // Optional
 
 	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 	//pipelineLayoutInfo.setLayoutCount = 1;//static_cast<uint32_t>( descriptors.size()); // Optional
 	//pipelineLayoutInfo.pSetLayouts = &descriptors; // Optional
 
-	//pipelineLayoutInfo.setLayoutCount = descriptors->size();
-	//pipelineLayoutInfo.pSetLayouts = descriptors->data();
+	pipelineLayoutInfo.setLayoutCount = descriptors->size();
+	pipelineLayoutInfo.pSetLayouts = descriptors->data();
 
 	if (vkCreatePipelineLayout(
 		m_core_instance.get_device(), &pipelineLayoutInfo, nullptr, &m_pipeline_layout) != VK_SUCCESS) {

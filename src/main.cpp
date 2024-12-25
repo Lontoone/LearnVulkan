@@ -7,7 +7,7 @@
 #include "./core/Model.hpp"
 #include "./core/TransformObject.hpp"
 #include "core/GameObject.hpp"
-
+#include "./core/image.hpp"
 
 int main() {
 	ltn::DisplayWindow main_window{};
@@ -15,12 +15,17 @@ int main() {
 	std::unique_ptr<ltn::SwapChain> swapchain = std::make_unique<ltn::SwapChain>(coreInstance,main_window.SCR_WIDTH , main_window.SCR_HEIGHT);
 	std::unique_ptr<ltn::GraphicsPipeline> pipeline = std::make_unique<ltn::GraphicsPipeline>( coreInstance , *swapchain );
 	std::unique_ptr<ltn::Renderer>forward_renderer_pass = std::make_unique<ltn::Renderer>( coreInstance , *swapchain );
+	
 	ltn::GameObject gameobject{};
 	ltn::TransformObject transform{ coreInstance, *pipeline };
 	ltn::Model model{ coreInstance , *pipeline};
+	ltn::Image img{ coreInstance };
+	forward_renderer_pass->m_texture_image = &img;
+	img.load_texture("./assets/texture.jpg");
 
 	gameobject.add_component(&transform);
 	gameobject.add_component(&model);
+	gameobject.add_component(forward_renderer_pass.get());
 
 	pipeline->create_pipleine(
 		forward_renderer_pass->get_renderPass(),		
@@ -51,12 +56,15 @@ int main() {
 		// Detect resize :
 		if (main_window.frameBufferedResized) {
 			main_window.frameBufferedResized = false;
+			gameobject.remove_component(forward_renderer_pass->index);
 			vkDeviceWaitIdle(coreInstance.get_device());
 			swapchain->cleanup();
 			forward_renderer_pass->cleanup();
 			
 			swapchain = std::make_unique<ltn::SwapChain>(coreInstance, main_window.SCR_WIDTH, main_window.SCR_HEIGHT);
 			forward_renderer_pass = std::make_unique<ltn::Renderer>(coreInstance, *swapchain);
+			forward_renderer_pass->m_texture_image = &img;
+			gameobject.add_component(forward_renderer_pass.get());
 			/*
 			pipeline = std::make_unique<ltn::GraphicsPipeline>(coreInstance, *swapchain);
 			pipeline->create_pipleine(
@@ -70,8 +78,9 @@ int main() {
 		// collect update data
 		ltn::FrameUpdateData update_data{
 			swapchain->current_frame(),
-			(float)main_window.SCR_WIDTH/ (float)main_window.SCR_HEIGHT,
+			(float)main_window.SCR_WIDTH / (float)main_window.SCR_HEIGHT,
 			forward_renderer_pass->get_current_cmdbuffer(),
+			pipeline->get_layout()
 		};
 
 		forward_renderer_pass->reset_renderpass();

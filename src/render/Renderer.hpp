@@ -2,11 +2,22 @@
 #include "../core/Component.hpp"
 #include "../core/CoreInstance.hpp"
 #include "../core/SwapChain.hpp"
+#include "../core/Image.hpp"
 namespace ltn {
 	class Renderer : public Component {
 	public:
 		Renderer(ltn::CoreInstance& core_instance, ltn::SwapChain& swapchain);
 		~Renderer();
+
+		//------------------
+		//	Component class
+		//------------------
+		VkDescriptorSetLayout		get_descriptorset_layout() override;
+		void						update(FrameUpdateData& updateData) override;
+		//------------------
+		//	Additional Property
+		//------------------
+		Image* m_texture_image;
 
 		// Render
 		void reset_renderpass();
@@ -32,6 +43,7 @@ namespace ltn {
 		void create_commandBuffer();
 		void create_renderPass();
 
+		void bind(VkCommandBuffer& cmdBuf, VkPipelineLayout pipeline_layout);
 		
 		uint32_t m_imageIndex;
 

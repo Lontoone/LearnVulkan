@@ -11,6 +11,7 @@ class GameObject
 public:
 	std::vector<Component*> m_components;
 	void add_component(Component* comp);
+	void remove_component(int index);
 	std::vector<VkDescriptorSetLayout>* get_all_descriptorLayouts();
 	std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts;
 

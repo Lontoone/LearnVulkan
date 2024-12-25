@@ -10,6 +10,7 @@ namespace ltn{
         //virtual void update(FrameUpdateData& updateData ) {  };
         //virtual void bind(const VkCommandBuffer& cmdBuf) {};        
         virtual void update(FrameUpdateData& framedata) {};
+        unsigned int index;
     private:
         
     };

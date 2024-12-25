@@ -201,6 +201,26 @@ void ltn::Renderer::create_renderPass()
     }
 }
 
+void ltn::Renderer::bind(VkCommandBuffer& cmdBuf, VkPipelineLayout pipeline_layout)
+{
+    vkCmdBindDescriptorSets(cmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        pipeline_layout,   //Where to bind
+        1,  // index of the first descriptor set,
+        1,  // the number of sets to bind
+        &m_texture_image->get_descriptorset(), //array of set to bind
+        0, nullptr);
+}
+
+VkDescriptorSetLayout ltn::Renderer::get_descriptorset_layout()
+{
+    return m_texture_image->get_descriptorsetLayout();
+}
+
+void ltn::Renderer::update(FrameUpdateData& updateData)
+{
+    this->bind(updateData.cmdbuf , updateData.pipelineLayout);
+}
+
 void ltn::Renderer::reset_renderpass()
 {
       // [1] Wait for previous fence

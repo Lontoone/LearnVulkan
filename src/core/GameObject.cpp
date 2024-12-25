@@ -2,7 +2,19 @@
 
 void ltn::GameObject::add_component(Component* comp)
 {
+	comp->index = this->m_components.size();
 	this->m_components.emplace_back(comp);
+}
+
+void ltn::GameObject::remove_component(int index)
+{
+	this->m_components.erase(this->m_components.begin() + index);
+	// update index
+	int i = 0;
+	for (auto cmp : this->m_components) {
+		cmp->index = i;
+		++i;
+	}
 }
 
 std::vector<VkDescriptorSetLayout>* ltn::GameObject::get_all_descriptorLayouts()
