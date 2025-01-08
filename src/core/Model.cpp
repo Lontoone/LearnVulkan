@@ -44,7 +44,7 @@ void ltn::Model::load_model(const char* model_path)
 	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_path)) {
 		throw std::runtime_error(warn + err);
 	}
-	std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+	
 	// combine all of the faces in the file into a single model
 	for (const auto& shape : shapes) {
 		for (const auto& index : shape.mesh.indices) {

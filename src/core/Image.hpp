@@ -21,6 +21,7 @@ namespace ltn{
         VkBuffer m_staging_buffer;
         VkDeviceMemory m_staging_buffer_memory;
 
+        uint32_t mipLevels;
         VkImage m_texture_image;
         VkDeviceMemory m_texture_image_memory;
         VkImageView m_texture_imageView;
@@ -38,6 +39,7 @@ namespace ltn{
         void createDescriptorSetLayout();
         void create_descriptor_pool();
         void create_descriptor();
+        void generateMipmaps();
 
         // helper function
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
