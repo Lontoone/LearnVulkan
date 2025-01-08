@@ -40,6 +40,8 @@ static VkFormat findDepthFormat(const VkPhysicalDevice& physical_device) {
 static void createImage(
     VkDevice device , 
     VkPhysicalDevice physical_device,
+    uint32_t mipLevels,
+    VkSampleCountFlagBits numSamples,
     uint32_t width, 
     uint32_t height, 
     VkFormat format, 
@@ -54,13 +56,13 @@ static void createImage(
     imageInfo.extent.width = width;
     imageInfo.extent.height = height;
     imageInfo.extent.depth = 1;
-    imageInfo.mipLevels = 1;
+    imageInfo.mipLevels = mipLevels;
     imageInfo.arrayLayers = 1;
     imageInfo.format = format;
     imageInfo.tiling = tiling;
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imageInfo.usage = usage;
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.samples = numSamples;
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
@@ -208,3 +210,4 @@ static void copyBuffer( VkDevice device , uint32_t graphics_queue_family , VkQue
     vkDestroyCommandPool(device , commandPool,nullptr);
 
 }
+

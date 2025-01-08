@@ -254,6 +254,22 @@ void ltn::CoreInstance::get_suitable_queuefamily(VkPhysicalDevice device, QueueF
     }
 }
 
+VkSampleCountFlagBits ltn::CoreInstance::getMaxUsableSampleCount()
+{
+    VkPhysicalDeviceProperties physicalDeviceProperties;
+    vkGetPhysicalDeviceProperties(m_physicalDevice, &physicalDeviceProperties);
+
+    VkSampleCountFlags counts = physicalDeviceProperties.limits.framebufferColorSampleCounts & physicalDeviceProperties.limits.framebufferDepthSampleCounts;
+    if (counts & VK_SAMPLE_COUNT_64_BIT) { return VK_SAMPLE_COUNT_64_BIT; }
+    if (counts & VK_SAMPLE_COUNT_32_BIT) { return VK_SAMPLE_COUNT_32_BIT; }
+    if (counts & VK_SAMPLE_COUNT_16_BIT) { return VK_SAMPLE_COUNT_16_BIT; }
+    if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
+    if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }
+    if (counts & VK_SAMPLE_COUNT_2_BIT) { return VK_SAMPLE_COUNT_2_BIT; }
+
+    return VK_SAMPLE_COUNT_1_BIT;
+}
+
 void ltn::CoreInstance::setup_physical_device()
 {
     std::vector<VkPhysicalDevice>	m_devices;
@@ -266,6 +282,7 @@ void ltn::CoreInstance::setup_physical_device()
     for (const auto& device : m_devices) {
         if (is_physical_device_suitable(device)) {
             m_physicalDevice = device;
+            m_msaaSamples = getMaxUsableSampleCount();
             break;
         }
     }

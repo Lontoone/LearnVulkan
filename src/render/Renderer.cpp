@@ -24,14 +24,15 @@ void ltn::Renderer::create_frameBuffer(SwapChain& swapchain, VkRenderPass render
 
     for (size_t i = 0; i < swapchain.get_image_views().size(); i++) {
         VkImageView attachments[] = {
-            swapchain.get_image_views()[i] ,
-            swapchain.get_depth_img_view()
+            swapchain.get_color_img_view() ,
+            swapchain.get_depth_img_view(),
+            swapchain.get_image_views()[i]
         };
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         framebufferInfo.renderPass = renderPass;
-        framebufferInfo.attachmentCount = 2;  //attachments.size
+        framebufferInfo.attachmentCount = 3;
         framebufferInfo.pAttachments = attachments;
         framebufferInfo.width = swapchain._width();
         framebufferInfo.height = swapchain._height();
@@ -75,7 +76,7 @@ void ltn::Renderer::create_renderPass()
     VkAttachmentDescription colorAttachment{};
     //should match the format of the swap chain images
     colorAttachment.format = m_swapchain.get_format();
-    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorAttachment.samples = m_core_instance.numSamples();
     colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
@@ -116,7 +117,8 @@ void ltn::Renderer::create_renderPass()
     chain after rendering, which is why we use VK_IMAGE_LAYOUT_PRESENT_SRC_KHR as finalLayout.
     */
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; //which layout the image will have before the render pass begins. 
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    //colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR; // multisampled images cannot be presented directly. We first need to resolve them to a regular image. 
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     //-------------------
     // 	   Pipeline Reference
@@ -130,7 +132,7 @@ void ltn::Renderer::create_renderPass()
    //--------------------------
     VkAttachmentDescription depthAttachment{};
     depthAttachment.format = findDepthFormat(m_core_instance.get_physical_device()); // The format should be the same as the depth image itself.
-    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    depthAttachment.samples = m_core_instance.numSamples();
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE; // it will not be used after drawing has finished.
     depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -142,6 +144,21 @@ void ltn::Renderer::create_renderPass()
     depthAttachmentRef.attachment = 1;
     depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
+    //--------------------------
+    //      Present
+    //--------------------------
+    VkAttachmentDescription colorAttachmentResolve{};
+    colorAttachmentResolve.format = m_swapchain.get_format();
+    colorAttachmentResolve.samples = VK_SAMPLE_COUNT_1_BIT;
+    colorAttachmentResolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachmentResolve.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    colorAttachmentResolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachmentResolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    colorAttachmentResolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    colorAttachmentResolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    VkAttachmentReference colorAttachmentResolveRef{};
+    colorAttachmentResolveRef.attachment = 2;
+    colorAttachmentResolveRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 
     VkSubpassDescription subpass{};
@@ -151,6 +168,7 @@ void ltn::Renderer::create_renderPass()
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &colorAttachmentRef;
     subpass.pDepthStencilAttachment = &depthAttachmentRef;
+    subpass.pResolveAttachments = &colorAttachmentResolveRef;
 
     // Subpasses in a render pass automatically take care of image layout transitions. 
     // These transitions are controlled by subpass dependencies, which specify memory 
@@ -185,7 +203,7 @@ void ltn::Renderer::create_renderPass()
     //--------------------------
     //      Render Pass
     //--------------------------    
-    std::vector<VkAttachmentDescription> attachments{ colorAttachment, depthAttachment };
+    std::vector<VkAttachmentDescription> attachments{ colorAttachment, depthAttachment , colorAttachmentResolve };
     VkRenderPassCreateInfo renderpassinfo{};
     renderpassinfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderpassinfo.attachmentCount = static_cast<uint32_t>(attachments.size());;

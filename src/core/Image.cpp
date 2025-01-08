@@ -76,7 +76,7 @@ void ltn::Image::create_texture()
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     // Samples flag is related to multisampling. This is only relevant for images 
     // that will be used as attachments, so stick to one sample.  (Useful in stoeing 3D terrain map)
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.samples = m_core_instance.numSamples();
     imageInfo.flags = 0; // Optional
 
     if (vkCreateImage(m_core_instance.get_device(), &imageInfo, nullptr, &m_texture_image) != VK_SUCCESS) {

@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <optional>
 #include <cstring>
+
 namespace ltn {
 	class CoreInstance
 	{
@@ -40,6 +41,7 @@ namespace ltn {
 		inline const VkQueue graphic_queue() const { return m_graphicsQueue; }
 		inline const VkQueue present_queue() const { return m_presentQueue; }
 		inline const VkCommandPool& cmd_pool() const { return m_commandPool; }
+		inline const VkSampleCountFlagBits& numSamples() const {return m_msaaSamples;}
 
 	private:
 		void cleanup();
@@ -99,6 +101,12 @@ namespace ltn {
 		const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 		VkDebugUtilsMessengerEXT m_debugMessenger;
+		VkSampleCountFlagBits m_msaaSamples = VK_SAMPLE_COUNT_1_BIT;
+
+		//--------------------
+		// Helper functions
+		//--------------------
+		VkSampleCountFlagBits getMaxUsableSampleCount();
 
 	};
 

@@ -100,7 +100,11 @@ void ltn::SwapChain::create_images()
 	//-----------------	
 	//vkGetSwapchainImagesKHR(m_core_instance.get_device(), m_swapchain, &m_image_count, nullptr);
 	//swapChainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(m_core_instance.get_device(), m_swapchain, &m_image_count, m_swapChain_images.data());
+	vkGetSwapchainImagesKHR(
+		m_core_instance.get_device(),
+		m_swapchain, 
+		&m_image_count,
+		m_swapChain_images.data());
 }
 
 void ltn::SwapChain::create_image_view()
@@ -175,13 +179,24 @@ void ltn::SwapChain::create_depth_buffer()
 	bool has_stencil = hasStencilComponent(depth_format);
 	createImage(
 		m_core_instance.get_device(), m_core_instance.get_physical_device(),
-		m_width, m_height, depth_format,
+		1, m_core_instance.numSamples(), m_width, m_height, depth_format,
 		VK_IMAGE_TILING_OPTIMAL,
 		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
 		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 		depthImage,
 		depthImageMemory);
 	depthImageView = createImageView(m_core_instance.get_device(), depthImage, depth_format, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+	// temp
+	createImage(
+		m_core_instance.get_device(), m_core_instance.get_physical_device(),
+		1, m_core_instance.numSamples(),m_width, m_height, get_format(),
+		VK_IMAGE_TILING_OPTIMAL,
+		VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+		colorImage,
+		colorImageMemory);
+	colorImageView = createImageView(m_core_instance.get_device(), colorImage, get_format(), VK_IMAGE_ASPECT_COLOR_BIT );
 
 }
 

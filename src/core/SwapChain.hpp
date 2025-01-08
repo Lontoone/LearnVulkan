@@ -36,6 +36,7 @@ namespace ltn{
         inline const VkSemaphore get_avaliable_semaphore() { return m_imageAvailableSemaphores[m_currentFrame]; }  // todo: auto fence pool
         inline const VkSemaphore get_finish_semaphore() { return m_renderFinishedSemaphores[m_currentFrame]; }  // todo: auto fence pool
         inline const VkImageView& get_depth_img_view() const { return depthImageView; }
+        inline const VkImageView& get_color_img_view() const { return colorImageView; }
         void update_frame_count() { (m_currentFrame + 1) % MAX_FRAMES_IN_FLIGHT; };
 
         void cleanup();
@@ -56,8 +57,11 @@ namespace ltn{
         std::vector<VkImageView>    m_swapChain_image_views;
 
         VkImage depthImage;
+        VkImage colorImage;
         VkDeviceMemory depthImageMemory;
+        VkDeviceMemory colorImageMemory;
         VkImageView depthImageView;          
+        VkImageView colorImageView;
 
         // sync object
         std::vector<VkSemaphore> m_imageAvailableSemaphores;
