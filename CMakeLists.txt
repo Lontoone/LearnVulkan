@@ -28,6 +28,8 @@ set(CMAKE_CXX_STANDARD 20)  # using c++ version 20
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Source files
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.hpp" "src/*.h")
+file(GLOB_RECURSE LIB "lib/tiny_obj_loader.h")
+#include_directories(${CMAKE_SOURCE_DIR}/lib)
 #file(GLOB_RECURSE INCLUDE "include/imgui/*.cpp" "include/imgui/*.h"  "include/imgui/backends/*.h" "include/imgui/backends/*.cpp")
 #file(GLOB_RECURSE INCLUDE "include/imgui/*.cpp" )
 
@@ -42,7 +44,7 @@ add_library(imgui
 )
 
 # Add executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${imgui})
+add_executable(${PROJECT_NAME} ${SOURCES} ${imgui} ${LIB})
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${Vulkan_INCLUDE_DIRS}
     ${GLFW_INCLUDE_DIRS})

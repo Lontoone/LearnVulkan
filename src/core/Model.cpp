@@ -5,8 +5,6 @@
 ltn::Model::Model(CoreInstance& core, GraphicsPipeline& pipeline)
 	:coreInstance{ core }, m_pipeline{pipeline}
 {	
-	createVertexBuffer();
-	createIndexBuffer();
 }
 
 ltn::Model::~Model()
@@ -27,12 +25,52 @@ void ltn::Model::bind(VkCommandBuffer& cmdbuffer)
 	VkBuffer vertexBuffers[] = { vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(cmdbuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	//vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 }
 
 void ltn::Model::draw(VkCommandBuffer& cmdbuffer)
 {
 	vkCmdDrawIndexed(cmdbuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+}
+
+void ltn::Model::load_model(const char* model_path)
+{
+	tinyobj::attrib_t attrib;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+	std::string warn, err;
+
+	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, model_path)) {
+		throw std::runtime_error(warn + err);
+	}
+	std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+	// combine all of the faces in the file into a single model
+	for (const auto& shape : shapes) {
+		for (const auto& index : shape.mesh.indices) {
+			Vertex vertex{};
+
+			vertex.pos = {
+				attrib.vertices[3 * index.vertex_index + 0],
+				attrib.vertices[3 * index.vertex_index + 1],
+				attrib.vertices[3 * index.vertex_index + 2]
+			};
+
+			vertex.texCoord = {
+				attrib.texcoords[2 * index.texcoord_index + 0],
+				1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+			};
+
+			vertex.color = { 1.0f, 1.0f, 1.0f };
+
+			vertices.push_back(vertex);
+			indices.push_back(indices.size());
+		}
+	}
+
+
+	createVertexBuffer();
+	createIndexBuffer();
 }
 
 void ltn::Model::createVertexBuffer()

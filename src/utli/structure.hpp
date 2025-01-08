@@ -9,6 +9,9 @@ namespace ltn
         glm::vec3 pos;
         glm::vec3 color;        
         glm::vec2 texCoord;
+        bool operator==(const Vertex& other) const {
+            return pos == other.pos && color == other.color && texCoord == other.texCoord;
+        }
     
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
@@ -19,9 +22,9 @@ namespace ltn
             return bindingDescription;
         }
 
-        static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
+        static ::std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
             // 2 attr in vertex : pos and color
-            std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
+            ::std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
             attributeDescriptions[0].binding = 0;
             attributeDescriptions[0].location = 0;
             attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;

@@ -1,3 +1,4 @@
+#define TINYOBJLOADER_IMPLEMENTATION
 #include "./core/DisplayWindow.hpp"
 #include "./core/CoreInstance.hpp"
 #include "./core/SwapChain.hpp"
@@ -10,6 +11,11 @@
 #include "./core/image.hpp"
 
 int main() {
+	// temp:
+	const std::string MODEL_PATH = "./assets/models/viking_room.obj";
+    const std::string TEXTURE_PATH = "./assets/models/viking_room.png";
+
+
 	ltn::DisplayWindow main_window{};
 	ltn::CoreInstance coreInstance{ *main_window.get_window() };
 	std::unique_ptr<ltn::SwapChain> swapchain = std::make_unique<ltn::SwapChain>(coreInstance,main_window.SCR_WIDTH , main_window.SCR_HEIGHT);
@@ -21,7 +27,9 @@ int main() {
 	ltn::Model model{ coreInstance , *pipeline};
 	ltn::Image img{ coreInstance };
 	forward_renderer_pass->m_texture_image = &img;
-	img.load_texture("./assets/texture.jpg");
+	//img.load_texture("./assets/texture.jpg");
+	img.load_texture(TEXTURE_PATH.c_str());
+	model.load_model(MODEL_PATH.c_str());
 
 	gameobject.add_component(&transform);
 	gameobject.add_component(&model);
